@@ -1,5 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import User
+import uuid
+import os
+
+def complaint_image_path(instance, filename):
+    """Generate unique path for each complaint image."""
+    unique_id = uuid.uuid4().hex[:10]  # Unique 10-character ID
+    ext = filename.split('.')[-1]  # Get file extension
+    filename = f"{unique_id}.{ext}"  # Unique filename
+    return os.path.join('complaints/', filename)  # Store in media/complaints/
+
 
 class Complaint(models.Model):
     STATUS_CHOICES = [
@@ -8,6 +18,7 @@ class Complaint(models.Model):
         ('Completed', 'Completed'),
     ]
 
+    complaint_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     description = models.TextField()
